@@ -86,34 +86,63 @@ IDBRequest.addEventListener("upgradeneeded",()=>{
         
     });
 
+    
     const getIDBData = (mode,msg) => {
         const db = IDBRequest.result;
-        const IDBtransaction = db.transaction ("clientes",mode);
-        const objectStore = IDBtransaction.objectStore("clientes");
+        const IDBtransaction = db.transaction ("cliente",mode);
+        const objectStore = IDBtransaction.objectStore("cliente");
         IDBtransaction.addEventListener("complete",()=>{
             console.log(msg)
         })
         return objectStore;
     }
+ 
 
-    const leerObjeto = () =>{
-    
-        const IDBData = getIDBData("readonly");
-        const cursor = IDBData.openCursor();
-        const dniConsulta = document.getElementById('inputDniConsulta').value;
-        
-            cursor.addEventListener("success", ()=>{
-            if(cursor.result === dniConsulta){
-                let valorCursor=cursor.result.key;
+        function leerObjeto(dniCon) {
+            
+            const active = IDBRequest.result;
+            const data = active.transaction(["cliente"], "readonly");
+            const object = data.objectStore("cliente");
+            const index = object.index("by_dni");
+            const request = index.get(String(dniCon));
+            let test = document.getElementById("rowDni");
+            let fragment = document.createDocumentFragment();
+
+            request.onsuccess = function () {
+                var result = request.result;
+
+                if (result !== undefined) {
                
-                let test=document.getElementById('rowDni');
-                test.innerHTML=valorCursor.dni;
-            }
-           })
+                
+                   alert(result.dni);
+                   
+                }
+                else {
+                    alert("colocar dni valido");
+                }
+            };
         }
 
 
     document.getElementById('btnConsulta').addEventListener("click",(e)=>{
-        leerObjeto();
+        const dniCon = document.getElementById("inputDniConsulta").value;
+        leerObjeto(dniCon);
 
     })
+
+                 // const db = IDBRequest.result;
+        // const IDBtransaction = db.transaction("cliente","readonly");
+        // const objectStore = IDBtransaction.objectStore("cliente");
+        // const cursor = objectStore.openCursor();
+        // const dniConsulta = document.getElementById('inputDniConsulta').value;
+        
+        //     cursor.addEventListener("success", ()=>{
+        //     if(cursor.result ){
+        //         console.log(cursor.result.value);
+        //         c
+        //         onst curs = cursor.result.value;
+                
+        //         const row = document.getElementById("rowDni");              
+               
+        //         cursor.result.continue();
+        //     }
